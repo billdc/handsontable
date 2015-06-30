@@ -5,3 +5,6 @@ _SpecRunner.html
 .DS_Store
 cars.sqlite
 dev.html
+demo/bower_components/
+Gruntfile.js
+package.json
