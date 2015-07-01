@@ -32,7 +32,7 @@ function ContextMenu(instance, customOptions) {
   this.defaultOptions = {
     items: [{
       key: 'row_above',
-      name: 'Insert row above',
+      name: '此行前插入一行',
       callback: function(key, selection) {
         this.alter("insert_row", selection.start.row);
       },
@@ -45,7 +45,7 @@ function ContextMenu(instance, customOptions) {
       }
     }, {
       key: 'row_below',
-      name: 'Insert row below',
+      name: '此行后插入一行',
       callback: function(key, selection) {
         this.alter("insert_row", selection.end.row + 1);
       },
@@ -59,7 +59,7 @@ function ContextMenu(instance, customOptions) {
     },
       ContextMenu.SEPARATOR, {
         key: 'col_left',
-        name: 'Insert column on the left',
+        name: '左侧插入一列',
         callback: function(key, selection) {
           this.alter("insert_col", selection.start.col);
         },
@@ -76,7 +76,7 @@ function ContextMenu(instance, customOptions) {
         }
       }, {
         key: 'col_right',
-        name: 'Insert column on the right',
+        name: '右侧插入一列',
         callback: function(key, selection) {
           this.alter("insert_col", selection.end.col + 1);
         },
@@ -94,7 +94,7 @@ function ContextMenu(instance, customOptions) {
       },
       ContextMenu.SEPARATOR, {
         key: 'remove_row',
-        name: 'Remove row',
+        name: '删除行',
         callback: function(key, selection) {
           var amount = selection.end.row - selection.start.row + 1;
           this.alter("remove_row", selection.start.row, amount);
@@ -107,7 +107,7 @@ function ContextMenu(instance, customOptions) {
         }
       }, {
         key: 'remove_col',
-        name: 'Remove column',
+        name: '删除列',
         callback: function(key, selection) {
           var amount = selection.end.col - selection.start.col + 1;
           this.alter("remove_col", selection.start.col, amount);
@@ -125,7 +125,7 @@ function ContextMenu(instance, customOptions) {
       },
       ContextMenu.SEPARATOR, {
         key: 'undo',
-        name: 'Undo',
+        name: '撤销',
         callback: function() {
           this.undo();
         },
@@ -134,7 +134,7 @@ function ContextMenu(instance, customOptions) {
         }
       }, {
         key: 'redo',
-        name: 'Redo',
+        name: '重做',
         callback: function() {
           this.redo();
         },
@@ -165,11 +165,11 @@ function ContextMenu(instance, customOptions) {
       },
       ContextMenu.SEPARATOR, {
         key: 'alignment',
-        name: 'Alignment',
+        name: '对齐',
         submenu: {
           items: [{
             name: function() {
-              var label = "Left";
+              var label = "左对齐";
               var hasClass = contextMenu.checkSelectionAlignment(this, 'htLeft');
 
               if (hasClass) {
@@ -183,7 +183,7 @@ function ContextMenu(instance, customOptions) {
             disabled: false
           }, {
             name: function() {
-              var label = "Center";
+              var label = "居中";
               var hasClass = contextMenu.checkSelectionAlignment(this, 'htCenter');
 
               if (hasClass) {
@@ -197,7 +197,7 @@ function ContextMenu(instance, customOptions) {
             disabled: false
           }, {
             name: function() {
-              var label = "Right";
+              var label = "右对齐";
               var hasClass = contextMenu.checkSelectionAlignment(this, 'htRight');
 
               if (hasClass) {
@@ -211,7 +211,7 @@ function ContextMenu(instance, customOptions) {
             disabled: false
           }, {
             name: function() {
-              var label = "Justify";
+              var label = "两端对齐";
               var hasClass = contextMenu.checkSelectionAlignment(this, 'htJustify');
 
               if (hasClass) {
@@ -226,7 +226,7 @@ function ContextMenu(instance, customOptions) {
           },
             ContextMenu.SEPARATOR, {
               name: function() {
-                var label = "Top";
+                var label = "顶部对齐";
                 var hasClass = contextMenu.checkSelectionAlignment(this, 'htTop');
 
                 if (hasClass) {
@@ -240,7 +240,7 @@ function ContextMenu(instance, customOptions) {
               disabled: false
             }, {
               name: function() {
-                var label = "Middle";
+                var label = "上下居中";
                 var hasClass = contextMenu.checkSelectionAlignment(this, 'htMiddle');
 
                 if (hasClass) {
@@ -254,7 +254,7 @@ function ContextMenu(instance, customOptions) {
               disabled: false
             }, {
               name: function() {
-                var label = "Bottom";
+                var label = "底部对齐";
                 var hasClass = contextMenu.checkSelectionAlignment(this, 'htBottom');
 
                 if (hasClass) {
