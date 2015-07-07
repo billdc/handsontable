@@ -33,9 +33,9 @@ function ManualColumnFreeze(instance) {
         name: function() {
           var selectedColumn = instance.getSelected()[1];
           if (selectedColumn > fixedColumnsCount - 1) {
-            return 'Freeze this column';
+            return '冻结此列';
           } else {
-            return 'Unfreeze this column';
+            return '解除冻结此列';
           }
         },
         disabled: function() {

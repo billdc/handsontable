@@ -145,7 +145,7 @@ function ContextMenu(instance, customOptions) {
       ContextMenu.SEPARATOR, {
         key: 'make_read_only',
         name: function() {
-          var label = "Read only";
+          var label = "只读";
           var atLeastOneReadOnly = contextMenu.checkSelectionReadOnlyConsistency(this);
           if (atLeastOneReadOnly) {
             label = contextMenu.markSelected(label);
