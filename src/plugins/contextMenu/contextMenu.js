@@ -1105,8 +1105,8 @@ function prepareHorizontalAlignClass(className, alignment) {
     .replace('htLeft', '')
     .replace('htCenter', '')
     .replace('htRight', '')
-    .replace('htJustify', '')
-    .replace('  ', '');
+    .replace('htJustify', '');
+    //.replace('  ', '');
 
   className += " " + alignment;
   return className;
