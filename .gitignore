@@ -8,3 +8,5 @@ dev.html
 demo/bower_components/
 Gruntfile.js
 package.json
+dist
+bower_components
