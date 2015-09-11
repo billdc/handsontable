@@ -2,9 +2,10 @@
  * Utility to register plugins and common namespace for keeping reference to all plugins classes
  */
 
-export {registerPlugin, getPlugin};
+import {objectEach} from './helpers/object';
+import {toUpperCaseFirst} from './helpers/string';
 
-var registeredPlugins = new WeakMap();
+const registeredPlugins = new WeakMap();
 
 /**
  * Registers plugin under given name
@@ -13,10 +14,10 @@ var registeredPlugins = new WeakMap();
  * @param {Function} PluginClass
  */
 function registerPlugin(pluginName, PluginClass) {
-  Handsontable.hooks.add('beforeInit', function () {
-    var holder;
+  pluginName = toUpperCaseFirst(pluginName);
 
-    pluginName = pluginName.toLowerCase();
+  Handsontable.hooks.add('construct', function () {
+    var holder;
 
     if (!registeredPlugins.has(this)) {
       registeredPlugins.set(this, {});
@@ -46,17 +47,50 @@ function registerPlugin(pluginName, PluginClass) {
 /**
  * @param {Object} instance
  * @param {String|Function} pluginName
- * @returns {Function} pluginClass
+ * @returns {Function} pluginClass Returns plugin instance if exists or `undefined` if not exists.
  */
 function getPlugin(instance, pluginName) {
-  if (typeof pluginName != 'string'){
+  if (typeof pluginName != 'string') {
     throw Error('Only strings can be passed as "plugin" parameter');
   }
-  let _pluginName = pluginName.toLowerCase();
+  let _pluginName = toUpperCaseFirst(pluginName);
 
   if (!registeredPlugins.has(instance) || !registeredPlugins.get(instance)[_pluginName]) {
-    throw Error('No plugin registered under name "' + pluginName + '"');
+    return void 0;
   }
 
   return registeredPlugins.get(instance)[_pluginName];
 }
+
+/**
+ * Get all registred plugins names for concrete Handsontable instance.
+ *
+ * @param {Object} hotInstance
+ * @returns {Array}
+ */
+function getRegistredPluginNames(hotInstance) {
+  return registeredPlugins.has(hotInstance) ? Object.keys(registeredPlugins.get(hotInstance)) : [];
+}
+
+/**
+ * Get plugin name.
+ *
+ * @param {Object} hotInstance
+ * @param {Object} plugin
+ * @returns {String|null}
+ */
+function getPluginName(hotInstance, plugin) {
+  let pluginName = null;
+
+  if (registeredPlugins.has(hotInstance)) {
+    objectEach(registeredPlugins.get(hotInstance), (pluginInstance, name) => {
+      if (pluginInstance === plugin) {
+        pluginName = name;
+      }
+    });
+  }
+
+  return pluginName;
+}
+
+export {registerPlugin, getPlugin, getRegistredPluginNames, getPluginName};
