@@ -72,6 +72,7 @@
 
           <p>
             <button id="selectFirst">Select first cell</button>
+            <button id="changeColor">change color</button>
             <label><input type="checkbox" id="rowHeaders" checked="checked" autocomplete="off"> Show row headers</label>
             <label><input type="checkbox" id="colHeaders" checked="checked" autocomplete="off"> Show col headers</label>
           </p>
@@ -106,9 +107,9 @@
               selectFirst = document.getElementById('selectFirst'),
               rowHeaders = document.getElementById('rowHeaders'),
               colHeaders = document.getElementById('colHeaders'),
+              changeColor = document.getElementById('changeColor'),
               hot;
-
-            hot = new Handsontable(container, {
+            var settings =  {
               startRows: 15,
               startCols: 16,
               rowHeaders: true,
@@ -118,11 +119,50 @@
               contextMenu: false,
               outsideClickDeselects: false,
               removeRowPlugin: true
-            });
+            };
+            hot = new Handsontable(container,settings);
             hot.loadData(data);
 
             Handsontable.Dom.addEvent(selectFirst, 'click', function () {
               hot.selectCell(0,0);
+              console.log(cellType);
+            });
+
+            var colors = ["green","red","blue","yellow","pink"];
+            var color = "";
+            var cellType = [];
+            var greenRenderer = function (instance, td, row, col, prop, value, cellProperties) {
+              Handsontable.renderers.TextRenderer.apply(this, arguments);
+              td.style.backgroundColor = cellType[row+"_"+col];
+            };
+            Handsontable.Dom.addEvent(changeColor, 'click', function () {
+              console.log("click change color!!!");
+              var coordinates = hot.getSelected();
+              if(coordinates !== undefined){
+                var x1 = coordinates[0];
+                var y1 = coordinates[1];
+                var x2 = coordinates[2];
+                var y2 = coordinates[3];
+                if(x1>x2){
+                  x2 = [x1, x1 = x2][0];
+                }
+                if(y1>y2){
+                  y2 = [y1, y1 = y2][0];
+                }
+                color = colors[Math.floor(Math.random()*5)];
+                for(var i=x1;i<=x2;i++){
+                  for(var j=y1;j<=y2;j++){
+//                    hot.setDataAtCell(i,j,"new");
+                    if(settings.cell === undefined){
+                      settings.cell = [];
+                    }
+                    cellType[i+"_"+j] = colors[Math.floor(Math.random()*5)];
+                    settings.cell.push({row: i, col: j, renderer: greenRenderer});
+                    hot.updateSettings(settings);
+//                    greenRenderer(hot, hot.getCell(i,j), i, j, "", "newvalue", hot.getCellRenderer(i,j));
+                  }
+                }
+              }
             });
             Handsontable.Dom.addEvent(rowHeaders, 'click', function () {
               hot.updateSettings({

@@ -294,7 +294,7 @@ module.exports = function (grunt) {
   grunt.registerTask('sauce', ['default', 'connect:sauce', 'saucelabs-jasmine:walkontable', 'saucelabs-jasmine:handsontable']);
   grunt.registerTask('sauce:handsontable', ['default', 'connect:sauce', 'saucelabs-jasmine:handsontable']);
   grunt.registerTask('sauce:walkontable', ['default', 'connect:sauce', 'saucelabs-jasmine:walkontable']);
-
+  grunt.registerTask('serve', ['default', 'connect:server', 'saucelabs-jasmine:walkontable', 'saucelabs-jasmine:handsontable']);
   grunt.loadTasks('tasks');
   grunt.loadNpmTasks('hot-builder');
 };
