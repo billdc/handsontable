@@ -554,7 +554,13 @@ const REGISTERED_HOOKS = [
   /**
    * @event Hooks#persistentStateSave
    */
-  "persistentStateSave"
+  "persistentStateSave",
+
+  /**
+   * callback triggered after click merge cells in contextMenu
+   * @event Hooks#afterMerge
+   */
+  "afterMerge"
 ];
 
 import {EventManager} from './eventManager';

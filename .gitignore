@@ -6,6 +6,6 @@ _SpecRunner.html
 .DS_Store
 cars.sqlite
 dev.html
-
+dist/
 !dist/README.md
 node_modules/

@@ -386,13 +386,14 @@ var addMergeActionsToContextMenu = function(defaultOptions) {
       var sel = this.getSelected();
       var info = this.mergeCells.mergedCellInfoCollection.getInfo(sel[0], sel[1]);
       if (info) {
-        return 'Unmerge cells';
+        return '拆分单元格';
       } else {
-        return 'Merge cells';
+        return '合并单元格';
       }
     },
     callback: function() {
       this.mergeCells.mergeOrUnmergeSelection(this.getSelectedRange());
+      this.runHooks('afterMerge');
       this.render();
     },
     disabled: function() {

@@ -39,7 +39,7 @@ const _predefinedItems = {
   },
   [ROW_ABOVE]: {
     key: ROW_ABOVE,
-    name: 'Insert row above',
+    name: '此行前插入一行',
 
     callback: function(key, selection) {
       this.alter('insert_row', selection.start.row);
@@ -62,7 +62,7 @@ const _predefinedItems = {
   },
   [ROW_BELOW]: {
     key: ROW_BELOW,
-    name: 'Insert row below',
+    name: '此行后插入一行',
 
     callback: function(key, selection) {
       this.alter('insert_row', selection.end.row + 1);
@@ -85,7 +85,7 @@ const _predefinedItems = {
   },
   [COLUMN_LEFT]: {
     key: COLUMN_LEFT,
-    name: 'Insert column on the left',
+    name: '左侧插入一列',
     callback: function(key, selection) {
       this.alter('insert_col', selection.start.col);
     },
@@ -109,7 +109,7 @@ const _predefinedItems = {
   },
   [COLUMN_RIGHT]: {
     key: COLUMN_RIGHT,
-    name: 'Insert column on the right',
+    name: '右侧插入一列',
 
     callback: function(key, selection) {
       this.alter('insert_col', selection.end.col + 1);
@@ -134,7 +134,7 @@ const _predefinedItems = {
   },
   [CLEAR_COLUMN]: {
     key: CLEAR_COLUMN,
-    name: 'Clear column',
+    name: '清除列',
 
     callback: function(key, selection) {
       let column = selection.start.col;
@@ -155,7 +155,7 @@ const _predefinedItems = {
   },
   [REMOVE_ROW]: {
     key: REMOVE_ROW,
-    name: 'Remove row',
+    name: '删除行',
 
     callback: function(key, selection) {
       let amount = selection.end.row - selection.start.row + 1;
@@ -178,7 +178,7 @@ const _predefinedItems = {
   },
   [REMOVE_COLUMN]: {
     key: REMOVE_COLUMN,
-    name: 'Remove column',
+    name: '删除列',
 
     callback: function(key, selection) {
       let amount = selection.end.col - selection.start.col + 1;
@@ -205,7 +205,7 @@ const _predefinedItems = {
   },
   [UNDO]: {
     key: UNDO,
-    name: 'Undo',
+    name: '撤销',
 
     callback: function() {
       this.undo();
@@ -216,7 +216,7 @@ const _predefinedItems = {
   },
   [REDO]: {
     key: REDO,
-    name: 'Redo',
+    name: '重做',
 
     callback: function() {
       this.redo();
@@ -252,7 +252,7 @@ const _predefinedItems = {
   },
   [ALIGNMENT]: {
     key: ALIGNMENT,
-    name: 'Alignment',
+    name: '对齐',
     disabled: function() {
       return this.getSelectedRange() ? false : true;
     },
@@ -261,7 +261,7 @@ const _predefinedItems = {
         {
           key: `${ALIGNMENT}:left`,
           name: function() {
-            let label = 'Left';
+            let label = '左对齐';
             let hasClass = checkSelectionConsistency(this.getSelectedRange(), (row, col) => {
               let className = this.getCellMeta(row, col).className;
 
@@ -291,7 +291,7 @@ const _predefinedItems = {
         {
           key: `${ALIGNMENT}:center`,
           name: function() {
-            let label = 'Center';
+            let label = '居中';
             let hasClass = checkSelectionConsistency(this.getSelectedRange(), (row, col) => {
               let className = this.getCellMeta(row, col).className;
 
@@ -321,7 +321,7 @@ const _predefinedItems = {
         {
           key: `${ALIGNMENT}:right`,
           name: function() {
-            let label = 'Right';
+            let label = '右对齐';
             let hasClass = checkSelectionConsistency(this.getSelectedRange(), (row, col) => {
               let className = this.getCellMeta(row, col).className;
 
@@ -351,7 +351,7 @@ const _predefinedItems = {
         {
           key: `${ALIGNMENT}:justify`,
           name: function() {
-            let label = 'Justify';
+            let label = '自适应';
             let hasClass = checkSelectionConsistency(this.getSelectedRange(), (row, col) => {
               let className = this.getCellMeta(row, col).className;
 
@@ -384,7 +384,7 @@ const _predefinedItems = {
         {
           key: `${ALIGNMENT}:top`,
           name: function() {
-            let label = 'Top';
+            let label = '顶部对齐';
             let hasClass = checkSelectionConsistency(this.getSelectedRange(), (row, col) => {
               let className = this.getCellMeta(row, col).className;
 
@@ -413,7 +413,7 @@ const _predefinedItems = {
         {
           key: `${ALIGNMENT}:middle`,
           name: function() {
-            let label = 'Middle';
+            let label = '上下居中';
             let hasClass = checkSelectionConsistency(this.getSelectedRange(), (row, col) => {
               let className = this.getCellMeta(row, col).className;
 
@@ -443,7 +443,7 @@ const _predefinedItems = {
         {
           key: `${ALIGNMENT}:bottom`,
           name: function() {
-            let label = 'Bottom';
+            let label = '底部对齐';
             let hasClass = checkSelectionConsistency(this.getSelectedRange(), (row, col) => {
               let className = this.getCellMeta(row, col).className;
 
