@@ -560,7 +560,13 @@ const REGISTERED_HOOKS = [
    * callback triggered after click merge cells in contextMenu
    * @event Hooks#afterMerge
    */
-  "afterMerge"
+  "afterMerge",
+
+  /**
+  * callback triggered after undo or redo
+  * @event Hooks#afterUndo
+  */
+  "afterUndoRedo"
 ];
 
 import {EventManager} from './eventManager';
