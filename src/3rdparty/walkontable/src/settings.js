@@ -52,12 +52,13 @@ class WalkontableSettings {
       rowHeight: function(row) {
         return; //return undefined means use default size for the rendered cell content
       },
-      defaultRowHeight: 23,
-      defaultColumnWidth: 50,
+      defaultRowHeight: 36,
+      defaultColumnWidth: 80,
       selections: null,
       hideBorderOnMouseDownOver: false,
       viewportRowCalculatorOverride: null,
       viewportColumnCalculatorOverride: null,
+      width: null,
 
       //callbacks
       onCellMouseDown: null,
