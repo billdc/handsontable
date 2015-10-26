@@ -9,3 +9,4 @@ dev.html
 dist/
 !dist/README.md
 node_modules/
+demo/bower_components/

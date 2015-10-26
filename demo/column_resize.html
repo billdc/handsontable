@@ -74,7 +74,13 @@
           <p>Double click on the resize handle automatically adjusts size of the row or column.</p>
 
           <div class="state-loaded example1 alert">State of the table has been restored. <button class="mini reset-state1">Reset table state</button></div>
-          <div id="example1" style="width: 400px; height: 300px; overflow: hidden;"></div>
+          <p>
+            <button id="changeSize">get size</button>
+            <p id="showWidth"></p>
+            <p id="showHeight"></p>
+          </p>
+
+          <div id="example1" style="width: 800px; height: 600px; overflow: hidden;"></div>
 
           <p>
             <button name="dump" data-dump="#example1" data-instance="hot" title="Prints current data source to Firebug/Chrome Dev Tools">
@@ -104,7 +110,8 @@
               manualColumnResize: true,
               manualRowResize: true,
               minSpareRows: 1,
-              persistentState: true
+              persistentState: true,
+              contextMenu: true
             });
           </script>
 
@@ -118,7 +125,30 @@
               stateLoaded = document.querySelector('.state-loaded'),
               storedData = {},
               savedKeys;
-
+            Handsontable.Dom.addEvent(changeSize, 'click', function () {
+//              console.log(hot.getSettings().__proto__.colWidths);
+//              console.log(hot.getSettings().__proto__.rowHeights);
+              var rows = hot.getData().length;
+              var cols = hot.getData()[0].length;
+              var rowHeight = [];
+              var colWidth = [];
+              var temp;
+              for(var i=0;i<cols;i++){
+                temp = hot.getColWidth(i);
+                if(temp !== undefined){
+                  colWidth[i] = temp;
+                }
+              }
+              for(var i=0;i<rows;i++){
+                temp = hot.getRowHeight(i);
+                if(temp !== undefined){
+                  rowHeight[i] = temp;
+                }
+              }
+//              console.log(hot.getRowHeight(1));
+              document.getElementById("showWidth").innerHTML = "width :  "+colWidth;
+              document.getElementById("showHeight").innerHTML = "height :  "+rowHeight;
+            });
             Handsontable.Dom.addEvent(reset, 'click', function(){
               hot.runHooks('persistentStateReset');
               hot.updateSettings({
