@@ -6,8 +6,16 @@ import {inherit, deepClone} from './../../helpers/object';
 import {stopImmediatePropagation} from './../../helpers/dom/event';
 
 /**
- * Handsontable UndoRedo class
+ * @description
+ * Handsontable UndoRedo plugin. It allows to undo and redo certain actions done in the table.
+ * Please note, that not all actions are currently undo-able.
  *
+ * @example
+ * ```js
+ * ...
+ * undo: true
+ * ...
+ * ```
  * @class UndoRedo
  * @plugin UndoRedo
  */
@@ -17,14 +25,14 @@ Handsontable.UndoRedo = function(instance) {
   this.doneActions = [];
   this.undoneActions = [];
   this.ignoreNewActions = false;
-  instance.addHook("afterChange", function(changes, origin) {
+  instance.addHook('afterChange', function(changes, origin) {
     if (changes) {
       var action = new Handsontable.UndoRedo.ChangeAction(changes);
       plugin.done(action);
     }
   });
 
-  instance.addHook("afterCreateRow", function(index, amount, createdAutomatically) {
+  instance.addHook('afterCreateRow', function(index, amount, createdAutomatically) {
 
     if (createdAutomatically) {
       return;
@@ -34,15 +42,15 @@ Handsontable.UndoRedo = function(instance) {
     plugin.done(action);
   });
 
-  instance.addHook("beforeRemoveRow", function(index, amount) {
-    var originalData = plugin.instance.getData();
+  instance.addHook('beforeRemoveRow', function(index, amount) {
+    var originalData = plugin.instance.getSourceData();
     index = (originalData.length + index) % originalData.length;
     var removedData = originalData.slice(index, index + amount);
     var action = new Handsontable.UndoRedo.RemoveRowAction(index, removedData);
     plugin.done(action);
   });
 
-  instance.addHook("afterCreateCol", function(index, amount, createdAutomatically) {
+  instance.addHook('afterCreateCol', function(index, amount, createdAutomatically) {
 
     if (createdAutomatically) {
       return;
@@ -52,8 +60,8 @@ Handsontable.UndoRedo = function(instance) {
     plugin.done(action);
   });
 
-  instance.addHook("beforeRemoveCol", function(index, amount) {
-    var originalData = plugin.instance.getData();
+  instance.addHook('beforeRemoveCol', function(index, amount) {
+    var originalData = plugin.instance.getSourceData();
     index = (plugin.instance.countCols() + index) % plugin.instance.countCols();
     var removedData = [];
 
@@ -70,7 +78,7 @@ Handsontable.UndoRedo = function(instance) {
     plugin.done(action);
   });
 
-  instance.addHook("beforeCellAlignment", function(stateBefore, range, type, alignment) {
+  instance.addHook('beforeCellAlignment', function(stateBefore, range, type, alignment) {
     var action = new Handsontable.UndoRedo.CellAlignmentAction(stateBefore, range, type, alignment);
     plugin.done(action);
   });
@@ -92,15 +100,13 @@ Handsontable.UndoRedo.prototype.done = function(action) {
 Handsontable.UndoRedo.prototype.undo = function() {
   if (this.isUndoAvailable()) {
     var action = this.doneActions.pop();
+
     this.ignoreNewActions = true;
     var that = this;
     action.undo(this.instance, function() {
       that.ignoreNewActions = false;
       that.undoneActions.push(action);
     });
-
-
-
   }
 };
 
@@ -120,9 +126,6 @@ Handsontable.UndoRedo.prototype.redo = function() {
       that.ignoreNewActions = false;
       that.doneActions.push(action);
     });
-
-
-
   }
 };
 
@@ -303,11 +306,12 @@ inherit(Handsontable.UndoRedo.RemoveColumnAction, Handsontable.UndoRedo.Action);
 Handsontable.UndoRedo.RemoveColumnAction.prototype.undo = function(instance, undoneCallback) {
   var row, spliceArgs;
   var redoData=[];
-  for (var i = 0, len = instance.getData().length; i < len; i++) {
+  for (var i = 0, len = instance.getSourceData().length; i < len; i++) {
     row = instance.getSourceDataAtRow(i);
+
     spliceArgs = [this.index, 0];
     Array.prototype.push.apply(spliceArgs, this.data[i]);
-    redoData.push(this.data[i][0]);
+    //redoData.push(this.data[i][0]);
     Array.prototype.splice.apply(row, spliceArgs);
 
   }
@@ -327,7 +331,7 @@ Handsontable.UndoRedo.RemoveColumnAction.prototype.redo = function(instance, red
   instance.alter('remove_col', this.index, this.amount);
 };
 
-function init(){
+function init() {
   var instance = this;
   var pluginEnabled = typeof instance.getSettings().undo == 'undefined' || instance.getSettings().undo;
 
@@ -368,8 +372,7 @@ function onBeforeKeyDown(event) {
     if (event.keyCode === 89 || (event.shiftKey && event.keyCode === 90)) { //CTRL + Y or CTRL + SHIFT + Z
       instance.undoRedo.redo();
       stopImmediatePropagation(event);
-    }
-    else if (event.keyCode === 90) { //CTRL + Z
+    } else if (event.keyCode === 90) { // CTRL + Z
       instance.undoRedo.undo();
       stopImmediatePropagation(event);
     }
@@ -430,7 +433,7 @@ function exposeUndoRedoMethods(instance) {
   };
 }
 
-function removeExposedUndoRedoMethods(instance){
+function removeExposedUndoRedoMethods(instance) {
   delete instance.undo;
   delete instance.redo;
   delete instance.isUndoAvailable;

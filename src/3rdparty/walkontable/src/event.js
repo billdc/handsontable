@@ -3,10 +3,12 @@ import {
   closest,
   hasClass,
   isChildOf,
-    } from './../../../helpers/dom/element';
+} from './../../../helpers/dom/element';
 import {eventManager as eventManagerObject} from './../../../eventManager';
 
-
+/**
+ *
+ */
 function WalkontableEvent(instance) {
   var that = this;
 
@@ -100,7 +102,7 @@ function WalkontableEvent(instance) {
       if (that.instance.touchMoving === true) {
         that.instance.touchMoving = void 0;
 
-        eventManager.removeEventListener("touchmove", onTouchMove, false);
+        eventManager.removeEventListener('touchmove', onTouchMove, false);
 
         return;
       } else {
@@ -113,16 +115,17 @@ function WalkontableEvent(instance) {
     //eventManager.removeEventListener(that.instance.wtTable.holder, "mousedown", onMouseDown);
   };
 
-  var lastMouseOver;
   var onMouseOver = function(event) {
-    var table, td;
+    var table, td, mainWOT;
 
     if (that.instance.hasSetting('onCellMouseOver')) {
       table = that.instance.wtTable.TABLE;
       td = closest(event.realTarget, ['TD', 'TH'], table);
+      mainWOT = that.instance.cloneSource || that.instance;
 
-      if (td && td !== lastMouseOver && isChildOf(td, table)) {
-        lastMouseOver = td;
+      if (td && td !== mainWOT.lastMouseOver && isChildOf(td, table)) {
+        mainWOT.lastMouseOver = td;
+
         that.instance.getSetting('onCellMouseOver', event, that.instance.wtTable.getCoords(td), td, that.instance);
       }
     }
@@ -165,28 +168,23 @@ function WalkontableEvent(instance) {
     }
   };
 
-
   var onTouchEnd = function(event) {
     clearTimeout(longTouchTimeout);
     //that.instance.longTouch == void 0;
 
     event.preventDefault();
-
     onMouseUp(event);
 
     //eventManager.removeEventListener(that.instance.wtTable.holder, "mouseup", onMouseUp);
   };
 
   eventManager.addEventListener(this.instance.wtTable.holder, 'mousedown', onMouseDown);
-
   eventManager.addEventListener(this.instance.wtTable.TABLE, 'mouseover', onMouseOver);
-
   eventManager.addEventListener(this.instance.wtTable.holder, 'mouseup', onMouseUp);
-
 
   // check if full HOT instance, or detached WOT AND run on mobile device
   if (this.instance.wtTable.holder.parentNode.parentNode && Handsontable.mobileBrowser && !that.instance.wtTable.isWorkingOnClone()) {
-    var classSelector = "." + this.instance.wtTable.holder.parentNode.className.split(" ").join(".");
+    var classSelector = '.' + this.instance.wtTable.holder.parentNode.className.split(' ').join('.');
 
     eventManager.addEventListener(this.instance.wtTable.holder, 'touchstart', function(event) {
       that.instance.touchApplied = true;

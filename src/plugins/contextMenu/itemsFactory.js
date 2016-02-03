@@ -7,7 +7,6 @@ import {
   predefinedItems
 } from './predefinedItems';
 
-
 /**
  * Predefined items class factory for menu items.
  *
@@ -24,7 +23,7 @@ class ItemsFactory {
   /**
    * Set predefined items.
    *
-   * @param {Array} predefinedItems
+   * @param {Array} predefinedItems Array of predefined items.
    */
   setPredefinedItems(predefinedItems) {
     let items = {};

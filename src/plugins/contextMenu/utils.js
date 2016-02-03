@@ -20,6 +20,10 @@ export function isDisabled(cell) {
   return hasClass(cell, 'htDisabled');
 }
 
+export function isSelectionDisabled(cell) {
+  return hasClass(cell, 'htSelectionDisabled');
+}
+
 export function getValidSelection(hot) {
   let selected = hot.getSelected();
 
@@ -27,9 +31,6 @@ export function getValidSelection(hot) {
     return null;
   }
   if (selected[0] < 0) {
-    return null;
-  }
-  if (hot.countRows() >= hot.getSettings().maxRows) {
     return null;
   }
 

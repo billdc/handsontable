@@ -24,9 +24,9 @@ class BasePlugin {
     privatePool.set(this, {hooks: {}});
     initializedPlugins = null;
 
+    this.pluginName = null;
     this.pluginsInitializedCallbacks = [];
     this.isPluginsReady = false;
-    this.pluginName = null;
     this.enabled = false;
     this.initialized = false;
 
@@ -113,7 +113,6 @@ class BasePlugin {
    */
   callOnPluginsReady(callback) {
     if (this.isPluginsReady) {
-      this.pluginsInitializedCallbacks.length = 0;
       callback();
     } else {
       this.pluginsInitializedCallbacks.push(callback);
@@ -127,6 +126,7 @@ class BasePlugin {
    */
   onAfterPluginsInitialized() {
     arrayEach(this.pluginsInitializedCallbacks, (callback) => callback());
+    this.pluginsInitializedCallbacks.length = 0;
     this.isPluginsReady = true;
   }
 
@@ -144,11 +144,7 @@ class BasePlugin {
         this.enablePlugin();
       }
       if (this.enabled && this.isEnabled()) {
-
-        if (this.updatePlugin) {
-          this.updatePlugin();
-        }
-
+        this.updatePlugin();
       }
     }
   }
@@ -170,8 +166,16 @@ class BasePlugin {
       this.eventManager.destroy();
     }
     this.clearHooks();
+
+    objectEach(this, (value, property) => {
+      if (property !== 'hot') {
+        this[property] = null;
+      }
+    });
     delete this.hot;
   }
 }
 
 export default BasePlugin;
+
+Handsontable.plugins.BasePlugin = BasePlugin;

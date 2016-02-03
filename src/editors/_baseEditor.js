@@ -58,6 +58,12 @@ BaseEditor.prototype.prepare = function(row, col, prop, td, originalValue, cellP
   this.originalValue = originalValue;
   this.cellProperties = cellProperties;
 
+  if (this.instance.view.isMouseDown() && document.activeElement && document.activeElement !== document.body) {
+    document.activeElement.blur();
+  } else if (!document.activeElement) { //IE
+    document.body.focus();
+  }
+
   this.state = Handsontable.EditorState.VIRGIN;
 };
 
@@ -232,4 +238,29 @@ BaseEditor.prototype.isOpened = function() {
 
 BaseEditor.prototype.isWaiting = function() {
   return this.state === Handsontable.EditorState.WAITING;
+};
+
+BaseEditor.prototype.checkEditorSection = function() {
+  var totalRows = this.instance.countRows();
+  var section = '';
+
+  if (this.row < this.instance.getSettings().fixedRowsTop) {
+    if (this.col < this.instance.getSettings().fixedColumnsLeft) {
+      section = 'top-left-corner';
+    } else {
+      section = 'top';
+    }
+  } else if (this.instance.getSettings().fixedRowsBottom && this.row >= totalRows - this.instance.getSettings().fixedRowsBottom) {
+    if (this.col < this.instance.getSettings().fixedColumnsLeft) {
+      section = 'bottom-left-corner';
+    } else {
+      section = 'bottom';
+    }
+  } else {
+    if (this.col < this.instance.getSettings().fixedColumnsLeft) {
+      section = 'left';
+    }
+  }
+
+  return section;
 };

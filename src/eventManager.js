@@ -2,17 +2,16 @@
 import {polymerWrap, closest} from './helpers/dom/element';
 import {isWebComponentSupportedNatively} from './helpers/browser';
 
-
 /**
  * Event DOM manager for internal use in Handsontable.
  *
  * @class EventManager
- * @private
  * @util
  */
 class EventManager {
   /**
    * @param {Object} [context=null]
+   * @private
    */
   constructor(context = null) {
     this.context = context || this;
@@ -23,11 +22,11 @@ class EventManager {
   }
 
   /**
-   * Add event
+   * Register specified listener (`eventName`) to the element.
    *
-   * @param {Element} element
-   * @param {String} eventName
-   * @param {Function} callback
+   * @param {Element} element Target element.
+   * @param {String} eventName Event name.
+   * @param {Function} callback Function which will be called after event occur.
    * @returns {Function} Returns function which you can easily call to remove that event
    */
   addEventListener(element, eventName, callback) {
@@ -51,7 +50,7 @@ class EventManager {
             }
           });
         } else {
-          event.preventDefault = function () {
+          event.preventDefault = function() {
             this.returnValue = false;
           };
         }
@@ -65,7 +64,7 @@ class EventManager {
       element: element,
       event: eventName,
       callback: callback,
-      callbackProxy: callbackProxy
+      callbackProxy: callbackProxy,
     });
 
     if (window.addEventListener) {
@@ -73,7 +72,7 @@ class EventManager {
     } else {
       element.attachEvent('on' + eventName, callbackProxy);
     }
-    Handsontable.countEventManagerListeners ++;
+    Handsontable.countEventManagerListeners++;
 
     return () => {
       this.removeEventListener(element, eventName, callback);
@@ -81,11 +80,11 @@ class EventManager {
   }
 
   /**
-   * Remove event
+   * Remove the event listener previously registered.
    *
-   * @param {Element} element
-   * @param {String} eventName
-   * @param {Function} callback
+   * @param {Element} element Target element.
+   * @param {String} eventName Event name.
+   * @param {Function} callback Function to remove from the event target. It must be the same as during registration listener.
    */
   removeEventListener(element, eventName, callback) {
     let len = this.context.eventListeners.length;
@@ -105,14 +104,15 @@ class EventManager {
         } else {
           tmpEvent.element.detachEvent('on' + tmpEvent.event, tmpEvent.callbackProxy);
         }
-        Handsontable.countEventManagerListeners --;
+        Handsontable.countEventManagerListeners--;
       }
     }
   }
 
   /**
-   * Clear all events
+   * Clear all previously registered events.
    *
+   * @private
    * @since 0.15.0-beta3
    */
   clearEvents() {
@@ -131,14 +131,14 @@ class EventManager {
   }
 
   /**
-   * Clear all events
+   * Clear all previously registered events.
    */
   clear() {
     this.clearEvents();
   }
 
   /**
-   * Destroy instance
+   * Destroy instance of EventManager.
    */
   destroy() {
     this.clearEvents();
@@ -146,10 +146,10 @@ class EventManager {
   }
 
   /**
-   * Trigger event
+   * Trigger event at the specified target element.
    *
-   * @param {Element} element
-   * @param {String} eventName
+   * @param {Element} element Target element.
+   * @param {String} eventName Event name.
    */
   fireEvent(element, eventName) {
     let options = {
@@ -166,7 +166,7 @@ class EventManager {
       shiftKey: false,
       metaKey: false,
       button: 0,
-      relatedTarget: undefined
+      relatedTarget: undefined,
     };
     var event;
 
@@ -213,7 +213,7 @@ function extendEvent(context, event) {
   event = polymerWrap(event);
   len = event.path ? event.path.length : 0;
 
-  while (len --) {
+  while (len--) {
     if (event.path[len].nodeName === componentName) {
       isHotTableSpotted = true;
 
@@ -257,7 +257,7 @@ function extendEvent(context, event) {
       return polymerWrap(target);
     },
     enumerable: true,
-    configurable: true
+    configurable: true,
   });
 
   return event;

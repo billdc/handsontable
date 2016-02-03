@@ -6,14 +6,13 @@ import {registerPlugin} from './../../plugins';
 
 export {ManualColumnMove};
 
-//registerPlugin('manualColumnMove', ManualColumnMove);
-
 /**
- * HandsontableManualColumnMove
+ * @description
+ * Handsontable ManualColumnMove
  *
  * Has 2 UI components:
- * - handle - the draggable element that sets the desired position of the column
- * - guide - the helper guide that shows the desired position as a vertical guide
+ * * handle - the draggable element that sets the desired position of the column,
+ * * guide - the helper guide that shows the desired position as a vertical guide
  *
  * Warning! Whenever you make a change in this file, make an analogous change in manualRowMove.js
  *
@@ -45,8 +44,8 @@ function ManualColumnMove() {
     instance = this;
     currentTH = TH;
 
-    var col = this.view.wt.wtTable.getCoords(TH).col; //getCoords returns WalkontableCellCoords
-    if (col >= 0) { //if not row header
+    var col = this.view.wt.wtTable.getCoords(TH).col; // getCoords returns WalkontableCellCoords
+    if (col >= 0) { // if not row header
       currentCol = col;
       var box = currentTH.getBoundingClientRect();
       startOffset = box.left;
@@ -121,7 +120,7 @@ function ManualColumnMove() {
         if (th) {
           if (pressed) {
             var col = instance.view.wt.wtTable.getCoords(th).col;
-            if (col >= 0) { //not TH above row header
+            if (col >= 0) { // not TH above row header
               endCol = col;
               refreshHandlePosition(e.target, endCol - startCol);
             }
@@ -149,7 +148,6 @@ function ManualColumnMove() {
       }
     });
 
-
     eventManager.addEventListener(window, 'mouseup', function(e) {
       if (pressed) {
         hideHandleAndGuide();
@@ -161,7 +159,7 @@ function ManualColumnMove() {
         Handsontable.hooks.run(instance, 'beforeColumnMove', startCol, endCol);
 
         instance.forceFullRender = true;
-        instance.view.render(); //updates all
+        instance.view.render(); // updates all
 
         saveManualColumnPositions.call(instance);
 
@@ -193,7 +191,7 @@ function ManualColumnMove() {
   this.init = function(source) {
     var instance = this;
 
-    var manualColMoveEnabled = !! (this.getSettings().manualColumnMove);
+    var manualColMoveEnabled = !!(this.getSettings().manualColumnMove);
 
     if (manualColMoveEnabled) {
       var initialManualColumnPositions = this.getSettings().manualColumnMove;
@@ -211,10 +209,10 @@ function ManualColumnMove() {
       if (source === 'afterInit' || source === 'afterUpdateSettings' && eventManager.context.eventListeners.length === 0) {
 
         // update plugin usages count for manualColumnPositions
-        if (typeof instance.manualColumnPositionsPluginUsages != 'undefined') {
-          instance.manualColumnPositionsPluginUsages.push('manualColumnMove');
-        } else {
+        if (typeof instance.manualColumnPositionsPluginUsages === 'undefined') {
           instance.manualColumnPositionsPluginUsages = ['manualColumnMove'];
+        } else {
+          instance.manualColumnPositionsPluginUsages.push('manualColumnMove');
         }
 
         bindEvents.call(this);
@@ -236,7 +234,7 @@ function ManualColumnMove() {
   };
 
   this.modifyCol = function(col) {
-    //TODO test performance: http://jsperf.com/object-wrapper-vs-primitive/2
+    // TODO test performance: http://jsperf.com/object-wrapper-vs-primitive/2
     if (this.getSettings().manualColumnMove) {
       if (typeof this.manualColumnPositions[col] === 'undefined') {
         createPositionData(this.manualColumnPositions, col + 1);
@@ -309,11 +307,11 @@ function ManualColumnMove() {
 var htManualColumnMove = new ManualColumnMove();
 
 Handsontable.hooks.add('beforeInit', htManualColumnMove.beforeInit);
-Handsontable.hooks.add('afterInit', function () {
+Handsontable.hooks.add('afterInit', function() {
   htManualColumnMove.init.call(this, 'afterInit');
 });
 
-Handsontable.hooks.add('afterUpdateSettings', function () {
+Handsontable.hooks.add('afterUpdateSettings', function() {
   htManualColumnMove.init.call(this, 'afterUpdateSettings');
 });
 Handsontable.hooks.add('modifyCol', htManualColumnMove.modifyCol);
@@ -322,6 +320,3 @@ Handsontable.hooks.add('afterRemoveCol', htManualColumnMove.afterRemoveCol);
 Handsontable.hooks.add('afterCreateCol', htManualColumnMove.afterCreateCol);
 Handsontable.hooks.register('beforeColumnMove');
 Handsontable.hooks.register('afterColumnMove');
-
-
-

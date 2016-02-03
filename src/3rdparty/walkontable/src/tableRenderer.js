@@ -5,7 +5,8 @@ import {
   getScrollbarWidth,
   hasClass,
   innerHeight,
-    } from './../../../helpers/dom/element';
+  outerWidth
+} from './../../../helpers/dom/element';
 
 /**
  * @class WalkontableTableRenderer
@@ -17,6 +18,7 @@ class WalkontableTableRenderer {
   constructor(wtTable) {
     this.wtTable = wtTable;
     this.wot = wtTable.instance;
+
     // legacy support
     this.instance = wtTable.instance;
 
@@ -33,6 +35,7 @@ class WalkontableTableRenderer {
     this.columnHeaders = [];
     this.columnHeaderCount = 0;
     this.fixedRowsTop = 0;
+    this.fixedRowsBottom = 0;
   }
 
   /**
@@ -46,6 +49,7 @@ class WalkontableTableRenderer {
     this.rowHeaders = this.wot.getSetting('rowHeaders');
     this.rowHeaderCount = this.rowHeaders.length;
     this.fixedRowsTop = this.wot.getSetting('fixedRowsTop');
+    this.fixedRowsBottom = this.wot.getSetting('fixedRowsBottom');
     this.columnHeaders = this.wot.getSetting('columnHeaders');
     this.columnHeaderCount = this.columnHeaders.length;
 
@@ -55,6 +59,14 @@ class WalkontableTableRenderer {
     let totalRows = this.wot.getSetting('totalRows');
     let workspaceWidth;
     let adjusted = false;
+
+    if (WalkontableOverlay.isOverlayTypeOf(this.wot.cloneOverlay, WalkontableOverlay.CLONE_BOTTOM) ||
+        WalkontableOverlay.isOverlayTypeOf(this.wot.cloneOverlay, WalkontableOverlay.CLONE_BOTTOM_LEFT_CORNER)) {
+
+      // do NOT render headers on the bottom or bottom-left corner overlay
+      this.columnHeaders = [];
+      this.columnHeaderCount = 0;
+    }
 
     if (totalColumns > 0) {
       // prepare COL and TH elements for rendering
@@ -81,11 +93,21 @@ class WalkontableTableRenderer {
     }
     this.removeRedundantRows(rowsToRender);
 
-    if (!this.wtTable.isWorkingOnClone()) {
+    if (!this.wtTable.isWorkingOnClone() || this.wot.isOverlayName(WalkontableOverlay.CLONE_BOTTOM)) {
       this.markOversizedRows();
-
+    }
+    if (!this.wtTable.isWorkingOnClone()) {
       this.wot.wtViewport.createVisibleCalculators();
       this.wot.wtOverlays.refresh(false);
+
+      let hiderWidth = outerWidth(this.wtTable.hider);
+      let tableWidth = outerWidth(this.wtTable.TABLE);
+
+      if (hiderWidth !== 0 && (tableWidth !== hiderWidth)) {
+        // Recalculate the column widths, if width changes made in the overlays removed the scrollbar, thus changing the viewport width.
+        this.adjustColumnWidths(columnsToRender);
+      }
+
       this.wot.wtOverlays.applyToDOM();
 
       if (workspaceWidth !== this.wot.wtViewport.getWorkspaceWidth()) {
@@ -104,6 +126,9 @@ class WalkontableTableRenderer {
       }
 
       this.wot.getSetting('onDraw', true);
+
+    } else if (this.wot.isOverlayName(WalkontableOverlay.CLONE_BOTTOM)) {
+      this.wot.cloneSource.wtOverlays.adjustElementsSize();
     }
   }
 
@@ -130,7 +155,7 @@ class WalkontableTableRenderer {
 
     while (sourceRowIndex < totalRows && sourceRowIndex >= 0) {
       if (visibleRowIndex > 1000) {
-        throw new Error('Security brake: Too much TRs. Please define height for your table, which will enforce scrollbars.');
+        console.error('Security brake: Too much TRs. Please define height for your table, which will enforce scrollbars.');
       }
       if (rowsToRender !== void 0 && visibleRowIndex === rowsToRender) {
         // We have as much rows as needed for this clone
@@ -145,7 +170,9 @@ class WalkontableTableRenderer {
 
       lastTD = this.renderCells(sourceRowIndex, TR, columnsToRender);
 
-      if (!isWorkingOnClone) {
+      if (!isWorkingOnClone ||
+          // Necessary to refresh oversized row heights after editing cell in overlays
+          this.wot.isOverlayName(WalkontableOverlay.CLONE_BOTTOM)) {
         // Reset the oversized row cache for this row
         this.resetOversizedRow(sourceRowIndex);
       }
@@ -197,8 +224,9 @@ class WalkontableTableRenderer {
     let sourceRowIndex;
     let currentTr;
     let rowHeader;
+    let totalRows = this.instance.getSetting('totalRows');
 
-    if (expectedTableHeight === actualTableHeight) {
+    if (expectedTableHeight === actualTableHeight && !this.instance.getSetting('fixedRowsBottom')) {
       // If the actual table height equals rowCount * default single row height, no row is oversized -> no need to iterate over them
       return;
     }
@@ -324,7 +352,7 @@ class WalkontableTableRenderer {
   }
 
   /**
-   * @param {Number} columnsToRender
+   * @param {Number} columnsToRender Number of columns to render.
    */
   adjustColumnWidths(columnsToRender) {
     let scrollbarCompensation = 0;
@@ -368,6 +396,9 @@ class WalkontableTableRenderer {
     } else {
       // http://jsperf.com/nextsibling-vs-indexed-childnodes
       TR = currentTr.nextSibling;
+    }
+    if (TR.className) {
+      TR.removeAttribute('class');
     }
 
     return TR;

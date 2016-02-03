@@ -2,21 +2,20 @@
 import {
   outerHeight,
   outerWidth,
-  setOverlayPosition,
-    } from './../../../../helpers/dom/element';
+  setOverlayPosition
+} from './../../../../helpers/dom/element';
 import {WalkontableOverlay} from './_base';
 
-
 /**
- * @class WalkontableCornerOverlay
+ * @class WalkontableTopLeftCornerOverlay
  */
-class WalkontableCornerOverlay extends WalkontableOverlay {
+class WalkontableTopLeftCornerOverlay extends WalkontableOverlay {
   /**
    * @param {Walkontable} wotInstance
    */
   constructor(wotInstance) {
     super(wotInstance);
-    this.clone = this.makeClone(WalkontableOverlay.CLONE_CORNER);
+    this.clone = this.makeClone(WalkontableOverlay.CLONE_TOP_LEFT_CORNER);
   }
 
   /**
@@ -40,6 +39,7 @@ class WalkontableCornerOverlay extends WalkontableOverlay {
     let overlayRoot = this.clone.wtTable.holder.parentNode;
     let tableHeight = outerHeight(this.clone.wtTable.TABLE);
     let tableWidth = outerWidth(this.clone.wtTable.TABLE);
+    let preventOverflow = this.wot.getSetting('preventOverflow');
 
     if (this.trimmingContainer === window) {
       let box = this.wot.wtTable.hider.getBoundingClientRect();
@@ -47,19 +47,19 @@ class WalkontableCornerOverlay extends WalkontableOverlay {
       let left = Math.ceil(box.left);
       let bottom = Math.ceil(box.bottom);
       let right = Math.ceil(box.right);
-      let finalLeft;
-      let finalTop;
+      let finalLeft = '0';
+      let finalTop = '0';
 
-      if (left < 0 && (right - overlayRoot.offsetWidth) > 0) {
-        finalLeft = -left + 'px';
-      } else {
-        finalLeft = '0';
+      if (!preventOverflow || preventOverflow === 'vertical') {
+        if (left < 0 && (right - overlayRoot.offsetWidth) > 0) {
+          finalLeft = -left + 'px';
+        }
       }
 
-      if (top < 0 && (bottom - overlayRoot.offsetHeight) > 0) {
-        finalTop = -top + 'px';
-      } else {
-        finalTop = '0';
+      if (!preventOverflow || preventOverflow === 'horizontal') {
+        if (top < 0 && (bottom - overlayRoot.offsetHeight) > 0) {
+          finalTop = -top + 'px';
+        }
       }
       setOverlayPosition(overlayRoot, finalLeft, finalTop);
     }
@@ -68,6 +68,8 @@ class WalkontableCornerOverlay extends WalkontableOverlay {
   }
 }
 
-export {WalkontableCornerOverlay};
+export {WalkontableTopLeftCornerOverlay};
 
-window.WalkontableCornerOverlay = WalkontableCornerOverlay;
+window.WalkontableTopLeftCornerOverlay = WalkontableTopLeftCornerOverlay;
+
+WalkontableOverlay.registerOverlay(WalkontableOverlay.CLONE_TOP_LEFT_CORNER, WalkontableTopLeftCornerOverlay);

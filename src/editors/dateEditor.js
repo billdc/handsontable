@@ -9,7 +9,6 @@ import {TextEditor} from './textEditor';
 import moment from 'moment';
 import Pikaday from 'pikaday';
 
-
 Handsontable.editors = Handsontable.editors || {};
 Handsontable.editors.DateEditor = DateEditor;
 
@@ -22,6 +21,7 @@ Handsontable.editors.DateEditor = DateEditor;
 class DateEditor extends TextEditor {
   /**
    * @param {Core} hotInstance Handsontable instance
+   * @private
    */
   constructor(hotInstance) {
     this.$datePicker = null;
@@ -36,11 +36,11 @@ class DateEditor extends TextEditor {
 
   init() {
     if (typeof moment !== 'function') {
-      throw new Error("You need to include moment.js to your project.");
+      throw new Error('You need to include moment.js to your project.');
     }
 
     if (typeof Pikaday !== 'function') {
-      throw new Error("You need to include Pikaday to your project.");
+      throw new Error('You need to include Pikaday to your project.');
     }
     super.init();
     this.instance.addHook('afterDestroy', () => {

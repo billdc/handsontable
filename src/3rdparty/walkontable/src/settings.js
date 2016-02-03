@@ -1,7 +1,6 @@
 
 import {fastInnerText} from './../../../helpers/dom/element';
 
-
 /**
  * @class WalkontableSettings
  */
@@ -12,6 +11,7 @@ class WalkontableSettings {
    */
   constructor(wotInstance, settings) {
     this.wot = wotInstance;
+
     // legacy support
     this.instance = wotInstance;
 
@@ -25,15 +25,22 @@ class WalkontableSettings {
       stretchH: 'none', // values: all, last, none
       currentRowClassName: null,
       currentColumnClassName: null,
+      preventOverflow: function() {
+        return false;
+      },
 
       //data source
       data: void 0,
       fixedColumnsLeft: 0,
       fixedRowsTop: 0,
+      fixedRowsBottom: 0,
+      minSpareRows: 0,
+
       // this must be array of functions: [function (row, TH) {}]
       rowHeaders: function() {
         return [];
       },
+
       // this must be array of functions: [function (column, TH) {}]
       columnHeaders: function() {
         return [];
@@ -45,6 +52,7 @@ class WalkontableSettings {
 
         fastInnerText(TD, cellData === void 0 || cellData === null ? '' : cellData);
       },
+
       // columnWidth: 50,
       columnWidth: function(col) {
         return; //return undefined means use default size for the rendered cell content
@@ -63,6 +71,7 @@ class WalkontableSettings {
       //callbacks
       onCellMouseDown: null,
       onCellMouseOver: null,
+
       //    onCellMouseOut: null,
       onCellDblClick: null,
       onCellCornerMouseDown: null,
@@ -80,8 +89,9 @@ class WalkontableSettings {
       scrollbarHeight: 10,
 
       renderAllRows: false,
-      groups: false
+      groups: false,
     };
+
     // reference to settings
     this.settings = {};
 

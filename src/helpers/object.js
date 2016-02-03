@@ -1,4 +1,6 @@
 
+import {arrayEach} from './array';
+
 /**
  * Generate schema for passed object.
  *
@@ -59,6 +61,8 @@ export function extend(target, extension) {
   objectEach(extension, function(value, key) {
     target[key] = value;
   });
+
+  return target;
 }
 
 /**
@@ -72,8 +76,7 @@ export function deepExtend(target, extension) {
       if (!target[key]) {
         if (Array.isArray(extension[key])) {
           target[key] = [];
-        }
-        else {
+        } else {
           target[key] = {};
         }
       }
@@ -93,7 +96,7 @@ export function deepExtend(target, extension) {
  * @return {Object}
  */
 export function deepClone(obj) {
-  if (typeof obj === "object") {
+  if (typeof obj === 'object') {
     return JSON.parse(JSON.stringify(obj));
   }
 
@@ -109,9 +112,71 @@ export function deepClone(obj) {
 export function clone(object) {
   let result = {};
 
-  objectEach(object, (value, key) => result[key] = value);
+  objectEach(object, (value, key) => {
+    result[key] = value;
+  });
 
   return result;
+}
+
+/**
+ * Extend the Base object (usually prototype) of the functionality the `mixins` objects.
+ *
+ * @param {Object} Base Base object which will be extended.
+ * @param {Object} mixins The object of the functionality will be "copied".
+ * @returns {Object}
+ */
+export function mixin(Base, ...mixins) {
+  if (!Base.MIXINS) {
+    Base.MIXINS = [];
+  }
+  arrayEach(mixins, (mixin) => {
+    Base.MIXINS.push(mixin.MIXIN_NAME);
+
+    objectEach(mixin, (value, key) => {
+      if (Base.prototype[key] !== void 0) {
+        throw new Error(`Mixin conflict. Property '${key}' already exist and cannot be overwritten.`);
+      }
+      if (typeof value === 'function') {
+        Base.prototype[key] = value;
+
+      } else {
+        let getter = function _getter(propertyName, initialValue) {
+          propertyName = '_' + propertyName;
+
+          let initValue = (value) => {
+            if (Array.isArray(value) || isObject(value)) {
+              value = deepClone(value);
+            }
+
+            return value;
+          };
+
+          return function() {
+            if (this[propertyName] === void 0) {
+              this[propertyName] = initValue(initialValue);
+            }
+
+            return this[propertyName];
+          };
+        };
+        let setter = function _setter(propertyName) {
+          propertyName = '_' + propertyName;
+
+          return function(value) {
+            this[propertyName] = value;
+          };
+        };
+        Object.defineProperty(Base.prototype, key, {
+          get: getter(key, value),
+          set: setter(key),
+          configurable: true,
+        });
+      }
+    });
+  });
+
+  return Base;
 }
 
 /**
@@ -139,21 +204,19 @@ export function getPrototypeOf(obj) {
   var prototype;
 
   /* jshint ignore:start */
-  if(typeof obj.__proto__ == "object"){
+  if (typeof obj.__proto__ == 'object') {
     prototype = obj.__proto__;
   } else {
     var oldConstructor,
       constructor = obj.constructor;
 
-    if (typeof obj.constructor == "function") {
+    if (typeof obj.constructor == 'function') {
       oldConstructor = constructor;
 
-      if (delete obj.constructor){
+      if (delete obj.constructor) {
         constructor = obj.constructor; // get real constructor
         obj.constructor = oldConstructor; // restore constructor
       }
-
-
     }
 
     prototype = constructor ? constructor.prototype : null; // needed for IE
@@ -165,9 +228,9 @@ export function getPrototypeOf(obj) {
 
 export function defineGetter(object, property, value, options) {
   options.value = value;
-  options.writable = options.writable === false ? false : true;
-  options.enumerable = options.enumerable === false ? false : true;
-  options.configurable = options.configurable === false ? false : true;
+  options.writable = options.writable !== false;
+  options.enumerable = options.enumerable !== false;
+  options.configurable = options.configurable !== false;
 
   Object.defineProperty(object, property, options);
 }
@@ -189,4 +252,28 @@ export function objectEach(object, iteratee) {
   }
 
   return object;
+}
+
+/**
+ * Get object property by its name. Access to sub properties can be achieved by dot notation (e.q. `'foo.bar.baz'`).
+ *
+ * @param {Object} object Object which value will be exported.
+ * @param {String} name Object property name.
+ * @returns {*}
+ */
+export function getProperty(object, name) {
+  let names = name.split('.');
+  let result = object;
+
+  objectEach(names, (name) => {
+    result = result[name];
+
+    if (result === void 0) {
+      result = void 0;
+
+      return false;
+    }
+  });
+
+  return result;
 }

@@ -4,14 +4,15 @@ import {eventManager as eventManagerObject} from './../../eventManager';
 import {pageX, pageY} from './../../helpers/dom/event';
 import {registerPlugin} from './../../plugins';
 
+// Developer note! Whenever you make a change in this file, make an analogous change in manualRowResize.js
+
 /**
+ * @description
  * ManualColumnResize Plugin.
  *
  * Has 2 UI components:
  * - handle - the draggable element that sets the desired width of the column.
  * - guide - the helper guide that shows the desired width as a vertical guide.
- *
- * Developer note! Whenever you make a change in this file, make an analogous change in manualRowResize.js
  *
  * @plugin ManualColumnResize
  */
@@ -121,13 +122,13 @@ class ManualColumnResize extends BasePlugin {
   /**
    * Set the resize handle position.
    *
-   * @param {HTMLCellElement} TH
+   * @param {HTMLCellElement} TH TH HTML element.
    */
   setupHandlePosition(TH) {
     this.currentTH = TH;
-    let col = this.hot.view.wt.wtTable.getCoords(TH).col; //getCoords returns WalkontableCellCoords
+    let col = this.hot.view.wt.wtTable.getCoords(TH).col; // getCoords returns WalkontableCellCoords
 
-    if (col >= 0) { //if not col header
+    if (col >= 0) { // if not col header
       let box = this.currentTH.getBoundingClientRect();
 
       this.currentCol = col;
@@ -177,7 +178,7 @@ class ManualColumnResize extends BasePlugin {
   /**
    * Check if provided element is considered a column header.
    *
-   * @param {HTMLElement} element
+   * @param {HTMLElement} element HTML element.
    * @returns {Boolean}
    */
   checkIfColumnHeader(element) {
@@ -196,7 +197,7 @@ class ManualColumnResize extends BasePlugin {
   /**
    * Get the TH element from the provided element.
    *
-   * @param {HTMLElement} element
+   * @param {HTMLElement} element HTML element.
    * @returns {HTMLElement}
    */
   getTHFromTargetElement(element) {
@@ -215,13 +216,19 @@ class ManualColumnResize extends BasePlugin {
    * 'mouseover' event callback - set the handle position.
    *
    * @private
-   * @param {MouseEvent} e
+   * @param {MouseEvent} event
    */
   onMouseOver(event) {
     if (this.checkIfColumnHeader(event.target)) {
       let th = this.getTHFromTargetElement(event.target);
 
-      if (th) {
+      if (!th) {
+        return;
+      }
+
+      let colspan = th.getAttribute('colspan');
+
+      if (th && (colspan === null || colspan === 1)) {
         if (!this.pressed) {
           this.setupHandlePosition(th);
         }
@@ -242,10 +249,10 @@ class ManualColumnResize extends BasePlugin {
         this.newSize = hookNewSize;
       }
 
-      this.setManualSize(this.currentCol, this.newSize); //double click sets auto row size
+      this.setManualSize(this.currentCol, this.newSize); // double click sets auto row size
 
       this.hot.forceFullRender = true;
-      this.hot.view.render(); //updates all
+      this.hot.view.render(); // updates all
       this.hot.view.wt.wtOverlays.adjustElementsSize(true);
 
       this.hot.runHooks('afterColumnResize', this.currentCol, this.newSize, true);
@@ -307,7 +314,7 @@ class ManualColumnResize extends BasePlugin {
         this.hot.runHooks('beforeColumnResize', this.currentCol, this.newSize);
 
         this.hot.forceFullRender = true;
-        this.hot.view.render(); //updates all
+        this.hot.view.render(); // updates all
         this.hot.view.wt.wtOverlays.adjustElementsSize(true);
 
         this.saveManualColumnWidths();
@@ -335,7 +342,7 @@ class ManualColumnResize extends BasePlugin {
    * Cache the current column width.
    *
    * @param {Number} column Column index.
-   * @param {Number} width
+   * @param {Number} width Column width.
    * @returns {Number}
    */
   setManualSize(column, width) {
@@ -356,7 +363,7 @@ class ManualColumnResize extends BasePlugin {
    * Modify the provided column width, based on the plugin settings
    *
    * @private
-   * @param {Number} width
+   * @param {Number} width Column width.
    * @param {Number} column Column index.
    * @returns {Number}
    */
@@ -371,7 +378,6 @@ class ManualColumnResize extends BasePlugin {
 
     return width;
   }
-
 }
 
 export {ManualColumnResize};

@@ -408,6 +408,23 @@ describe('Core_selection', function () {
     expect(tickEnd).toEqual(1);
   });
 
+  it('should properly select columns, when the user moves the cursor over column headers across two overlays', function () {
+    handsontable({
+      startRows: 5,
+      startCols: 5,
+      colHeaders: true,
+      fixedColumnsLeft: 2
+    });
+
+    this.$container.find('.ht_clone_left tr:eq(0) th:eq(1)').simulate('mousedown');
+    this.$container.find('.ht_clone_left tr:eq(0) th:eq(1)').simulate('mouseover');
+    this.$container.find('.ht_clone_top tr:eq(0) th:eq(2)').simulate('mouseover');
+    this.$container.find('.ht_clone_left tr:eq(0) th:eq(1)').simulate('mouseover');
+    this.$container.find('.ht_clone_left tr:eq(0) th:eq(1)').simulate('mouseup');
+
+    expect(getSelected()).toEqual([0, 1, 4, 1]);
+  });
+
   it('should move focus to selected cell', function () {
     var $input = $('<input>').appendTo(document.body);
     handsontable({
@@ -655,7 +672,8 @@ describe('Core_selection', function () {
 
   });
 
-  it("should select a cell in a newly added row after automatic row adding, triggered by editing a cell in the last row with minSpareRows > 0", function () {
+  it("should select a cell in a newly added row after automatic row adding, triggered by editing a cell in the last row with minSpareRows > 0, " +
+    "unless editing happened within the fixed bottom rows", function () {
     var hot = handsontable({
       startRows: 5,
       startCols: 2,
@@ -673,6 +691,32 @@ describe('Core_selection', function () {
     runs(function () {
       expect(countRows()).toEqual(6);
       expect(getSelected()).toEqual([5,0,5,0]);
+    });
+  });
+
+  it("should not add new rows after editing a last table cell, if it's whiting the fixed bottom rows", function () {
+    var hot = handsontable({
+      startRows: 5,
+      startCols: 2,
+      fixedRowsBottom: 2,
+      minSpareRows: 1
+    });
+
+    if(!hot.view.wt.wtOverlays.bottomOverlay.clone) {
+      return;
+    }
+
+    selectCell(4,0);
+
+    keyDownUp('enter');
+    waits(100);
+    runs(function() {
+      keyDownUp('enter');
+    });
+    waits(100);
+    runs(function () {
+      expect(countRows()).toEqual(5);
+      expect(getSelected()).toEqual([4,0,4,0]);
     });
   });
 

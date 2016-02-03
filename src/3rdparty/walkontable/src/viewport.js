@@ -6,11 +6,10 @@ import {
   offset,
   outerHeight,
   outerWidth,
-    } from './../../../helpers/dom/element';
+} from './../../../helpers/dom/element';
 import {EventManager} from './../../../eventManager';
 import {WalkontableViewportColumnsCalculator} from './calculator/viewportColumns';
 import {WalkontableViewportRowsCalculator} from './calculator/viewportRows';
-
 
 /**
  * @class WalkontableViewport
@@ -21,7 +20,6 @@ class WalkontableViewport {
    */
   constructor(wotInstance) {
     this.wot = wotInstance;
-
     // legacy support
     this.instance = this.wot;
 
@@ -63,11 +61,16 @@ class WalkontableViewport {
 
   getWorkspaceWidth() {
     let width;
-    let totalColumns = this.instance.getSetting("totalColumns");
+    let totalColumns = this.wot.getSetting('totalColumns');
     let trimmingContainer = this.instance.wtOverlays.leftOverlay.trimmingContainer;
     let overflow;
-    let stretchSetting = this.instance.getSetting('stretchH');
+    let stretchSetting = this.wot.getSetting('stretchH');
     let docOffsetWidth = document.documentElement.offsetWidth;
+    let preventOverflow = this.wot.getSetting('preventOverflow');
+
+    if (preventOverflow) {
+      return outerWidth(this.instance.wtTable.wtRootElement);
+    }
 
     if (Handsontable.freezeOverlays) {
       width = Math.min(docOffsetWidth - this.getWorkspaceOffset().left, docOffsetWidth);
@@ -86,7 +89,7 @@ class WalkontableViewport {
     if (trimmingContainer !== window) {
       overflow = getStyle(this.instance.wtOverlays.leftOverlay.trimmingContainer, 'overflow');
 
-      if (overflow == "scroll" || overflow == "hidden" || overflow == "auto") {
+      if (overflow == 'scroll' || overflow == 'hidden' || overflow == 'auto') {
         // this is used in `scroll.html`
         // TODO test me
         return Math.max(width, trimmingContainer.clientWidth);
@@ -130,7 +133,7 @@ class WalkontableViewport {
 
     while (from < length) {
       sum += this.wot.wtTable.getColumnWidth(from);
-      from ++;
+      from++;
     }
 
     return sum;
@@ -147,9 +150,9 @@ class WalkontableViewport {
     let fillWidth;
     let dummyElement;
 
-    dummyElement = document.createElement("DIV");
-    dummyElement.style.width = "100%";
-    dummyElement.style.height = "1px";
+    dummyElement = document.createElement('div');
+    dummyElement.style.width = '100%';
+    dummyElement.style.height = '1px';
     mainContainer.appendChild(dummyElement);
     fillWidth = dummyElement.offsetWidth;
 
@@ -276,6 +279,9 @@ class WalkontableViewport {
     let pos;
     let fixedRowsTop;
     let scrollbarHeight;
+    let fixedRowsBottom;
+    let fixedRowsHeight;
+    let totalRows;
 
     this.rowHeaderWidth = NaN;
 
@@ -284,23 +290,31 @@ class WalkontableViewport {
     } else {
       height = this.getViewportHeight();
     }
-    pos = getScrollTop(this.wot.wtOverlays.mainTableScrollableElement) - this.wot.wtOverlays.topOverlay.getTableParentOffset();
+    pos = this.wot.wtOverlays.topOverlay.getScrollPosition() - this.wot.wtOverlays.topOverlay.getTableParentOffset();
 
     if (pos < 0) {
       pos = 0;
     }
     fixedRowsTop = this.wot.getSetting('fixedRowsTop');
+    fixedRowsBottom = this.wot.getSetting('fixedRowsBottom');
+    totalRows = this.wot.getSetting('totalRows');
 
     if (fixedRowsTop) {
-      let fixedRowsHeight = this.wot.wtOverlays.topOverlay.sumCellSizes(0, fixedRowsTop);
+      fixedRowsHeight = this.wot.wtOverlays.topOverlay.sumCellSizes(0, fixedRowsTop);
       pos += fixedRowsHeight;
       height -= fixedRowsHeight;
     }
 
-    if (this.wot.wtTable.holder.clientHeight !== this.wot.wtTable.holder.offsetHeight) {
-      scrollbarHeight = getScrollbarWidth();
-    } else {
+    if (fixedRowsBottom && this.wot.wtOverlays.bottomOverlay.clone) {
+      fixedRowsHeight = this.wot.wtOverlays.bottomOverlay.sumCellSizes(totalRows - fixedRowsBottom, totalRows);
+
+      height -= fixedRowsHeight;
+    }
+
+    if (this.wot.wtTable.holder.clientHeight === this.wot.wtTable.holder.offsetHeight) {
       scrollbarHeight = 0;
+    } else {
+      scrollbarHeight = getScrollbarWidth();
     }
 
     return new WalkontableViewportRowsCalculator(
